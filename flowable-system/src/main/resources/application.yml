@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    username: root
+    password: 542846492
+    url: jdbc:mysql://localhost:flowable-spring-boot/springboot?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    driver-class-name: com.mysql.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:mapping/*Mapper.xml
+  type-aliases-package: com.scd.entity
+
+#showSql
+logging:
+  level:
+    com:
+      example:
+        mapper : debug
