@@ -36,7 +36,16 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    // before: require('./mock/mock-server.js'),
+    proxy: {
+      '/dev-api': { // 这里是公共部分，在调用接口时后面接不相同的部分，/admin就相当于http://192.168.0.199:8926/admin这一段
+        target: 'http://localhost:8080/', // 这里写的是访问接口的域名和端口号
+        changeOrigin: true, // 必须加上这个才能跨域请求
+        pathRewrite: { // 重命名
+          '^/dev-api': ''
+        }
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
