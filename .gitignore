@@ -29,12 +29,3 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
-flowable-admin-ui/src/api/manage.js
-flowable-admin-ui/src/utils/util.js
-flowable-system/src/main/resources/static/
-flowable-system/src/main/resources/templates/
-logPath_IS_UNDEFINED/
-flowable-admin-ui/src/commons/customTranslate/translationsGerman.js
-flowable-admin-ui/src/components/VueBpmn/

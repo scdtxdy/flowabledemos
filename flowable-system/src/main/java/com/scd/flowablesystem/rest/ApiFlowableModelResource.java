@@ -2,10 +2,12 @@ package com.scd.flowablesystem.rest;
 
 import com.scd.flowablesystem.common.ReturnCode;
 import com.scd.flowablesystem.service.IFlowableModelService;
+import com.scd.flowablesystem.vo.ModelResponse;
 import com.scd.flowablesystem.vo.ModelVo;
 import com.scd.flowablesystem.vo.ReturnVo;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.ui.modeler.domain.AbstractModel;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.UnsupportedEncodingException;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,10 +31,8 @@ public class ApiFlowableModelResource {
 
   @Autowired
   private IFlowableModelService flowableModelService;
-
   @Autowired
   private ModelService modelService;
-
   @Autowired
   private RepositoryService repositoryService;
 
@@ -53,6 +52,24 @@ public class ApiFlowableModelResource {
     return returnVo;
   }
 
+  @GetMapping(value = "/getModelsById")
+  @ResponseBody
+  public ReturnVo<ModelVo> getModelById(@RequestParam String modelId) throws UnsupportedEncodingException {
+    ReturnVo<ModelVo> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
+    Model model = modelService.getModel(modelId);
+    if (model == null) {
+      throw new FlowableObjectNotFoundException("No model found with id " + modelId);
+    }
+    byte[] b = modelService.getBpmnXML(model);
+
+    String editor = new String(b, "UTF-8");
+    ModelVo modelVo = new ModelVo();
+    modelVo.setProcessId(model.getKey());
+    modelVo.setProcessName(model.getName());
+    modelVo.setXml(editor);
+    returnVo.setData(modelVo);
+    return returnVo;
+  }
 
   @PostMapping("/deploy")
   @ResponseBody
@@ -85,4 +102,5 @@ public class ApiFlowableModelResource {
     returnVo.setCode(ReturnCode.SUCCESS);
     return returnVo;
   }
+
 }

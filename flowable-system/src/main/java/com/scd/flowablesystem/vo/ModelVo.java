@@ -1,5 +1,7 @@
 package com.scd.flowablesystem.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -9,6 +11,7 @@ import java.io.Serializable;
  * @description: modelVo
  * @date : 2019/12/710:20
  */
+@Data
 public class ModelVo implements Serializable {
     //流程id
     private String processId;
@@ -20,36 +23,4 @@ public class ModelVo implements Serializable {
     private String categoryId;
     //流程的xml
     private String xml;
-
-    public String getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(String processId) {
-        this.processId = processId;
-    }
-
-    public String getProcessName() {
-        return processName;
-    }
-
-    public void setProcessName(String processName) {
-        this.processName = processName;
-    }
-
-    public String getXml() {
-        return xml;
-    }
-
-    public void setXml(String xml) {
-        this.xml = xml;
-    }
-
-    public String getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
 }

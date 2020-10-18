@@ -7,7 +7,9 @@ import 'element-ui/lib/theme-chalk/index.css'
 // lang i18n
 // import locale from 'element-ui/lib/locale/lang/en'
 // import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
-
+import VueClipboard from 'vue-clipboard2'
+import FormMaking from 'form-making'
+import 'form-making/dist/FormMaking.css'
 import '@/styles/index.scss' // global css
 
 import App from './App'
@@ -34,8 +36,12 @@ if (process.env.NODE_ENV === 'production') {
 // Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 Vue.use(ElementUI)
+Vue.use(VueClipboard)
+Vue.use(FormMaking)
+
 
 Vue.config.productionTip = false
+
 
 new Vue({
   el: '#app',
