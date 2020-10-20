@@ -51,7 +51,9 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
+      // meta: { title: '首页', icon: 'dashboard' }
+      meta: {title: '首页', icon: 'home',  "isCache": true, affix: true}
+
     }]
   },
   {
@@ -65,11 +67,12 @@ export const constantRoutes = [
         path: 'models',
         name: 'Models',
         component: () => import('@/views/processManager/models'),
-        meta: { title: '模板列表', icon: 'table' }
+        meta: { title: '模板列表', icon: 'table', "isCache": true, "affix": false}
       },
       {
         path: 'modelDesigner',
         name: 'modelDesigner',
+        hidden: true,
         component: () => import('@/views/processManager/modelDesigner'),
         meta: { title: '流程设计', icon: 'table' }
       }

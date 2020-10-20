@@ -1,8 +1,10 @@
 package com.scd.flowablesystem.rest;
 
+import com.scd.flowablesystem.common.ModelRequest;
+import com.scd.flowablesystem.common.ModelResponse;
+import com.scd.flowablesystem.common.ResponseFactory;
 import com.scd.flowablesystem.common.ReturnCode;
 import com.scd.flowablesystem.service.IFlowableModelService;
-import com.scd.flowablesystem.vo.ModelResponse;
 import com.scd.flowablesystem.vo.ModelVo;
 import com.scd.flowablesystem.vo.ReturnVo;
 import org.apache.commons.lang3.StringUtils;
@@ -10,14 +12,17 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ModelQuery;
 import org.flowable.ui.modeler.domain.AbstractModel;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,6 +41,38 @@ public class ApiFlowableModelResource {
   @Autowired
   private RepositoryService repositoryService;
 
+  @Autowired
+  private ResponseFactory responseFactory;
+
+  @GetMapping("getMldelsByPage")
+  @ResponseBody
+  public ReturnVo<org.flowable.engine.repository.Model> getModelsByPage(){
+    ReturnVo<org.flowable.engine.repository.Model> returnVo = new ReturnVo<>();
+    ModelQuery modelQuery = repositoryService.createModelQuery();
+    List<org.flowable.engine.repository.Model> list = modelQuery.list();
+    returnVo.setDatas(list);
+    return returnVo;
+  }
+
+  @PostMapping(value = "/saveModel")
+  @Transactional(rollbackFor = Exception.class)
+  public ReturnVo<String> createModel(@RequestBody ModelRequest modelRequest){
+    ReturnVo<String> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "OK");
+    long countNum = repositoryService.createModelQuery().modelKey(modelRequest.getKey()).count();
+    if (countNum > 0) {
+      throw new FlowableObjectNotFoundException("ModelKey already exists with id " + modelRequest.getKey());
+    }
+    org.flowable.engine.repository.Model model = repositoryService.newModel();
+    model.setKey(modelRequest.getKey());
+    model.setName(modelRequest.getName());
+    model.setVersion(1);
+    model.setMetaInfo(modelRequest.getMetaInfo());
+    model.setTenantId(modelRequest.getTenantId());
+    model.setCategory(modelRequest.getCategory());
+    repositoryService.saveModel(model);
+    return returnVo;
+  }
+
   @PostMapping(value = "/addModel")
   @ResponseBody
   public ReturnVo<String> addModel(@RequestBody ModelVo params) throws UnsupportedEncodingException, XMLStreamException {
@@ -45,10 +82,11 @@ public class ApiFlowableModelResource {
 
   @GetMapping(value = "/getModels")
   @ResponseBody
-  public ReturnVo<List<AbstractModel>> getModels(){
-    ReturnVo<List<AbstractModel>>returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
-    List<AbstractModel> modelsByModelType = modelService.getModelsByModelType(AbstractModel.MODEL_TYPE_BPMN);
-    returnVo.setData(modelsByModelType);
+  public ReturnVo<org.flowable.engine.repository.Model> getModels(){
+    ReturnVo<org.flowable.engine.repository.Model>returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
+    ModelQuery modelQuery = repositoryService.createModelQuery();
+    List<org.flowable.engine.repository.Model> list = modelQuery.list();
+    returnVo.setDatas(list);
     return returnVo;
   }
 
@@ -56,18 +94,16 @@ public class ApiFlowableModelResource {
   @ResponseBody
   public ReturnVo<ModelVo> getModelById(@RequestParam String modelId) throws UnsupportedEncodingException {
     ReturnVo<ModelVo> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
-    Model model = modelService.getModel(modelId);
+    org.flowable.engine.repository.Model model = repositoryService.getModel(modelId);
     if (model == null) {
       throw new FlowableObjectNotFoundException("No model found with id " + modelId);
     }
-    byte[] b = modelService.getBpmnXML(model);
-
-    String editor = new String(b, "UTF-8");
-    ModelVo modelVo = new ModelVo();
-    modelVo.setProcessId(model.getKey());
-    modelVo.setProcessName(model.getName());
-    modelVo.setXml(editor);
-    returnVo.setData(modelVo);
+    ModelResponse modelResponse = responseFactory.createModelResponse(model);
+    if (model.hasEditorSource()) {
+      byte[] editorBytes = repositoryService.getModelEditorSource(model.getId());
+      String editor = new String(editorBytes, "UTF-8");
+      modelResponse.setEditor(editor);
+    }
     return returnVo;
   }
 
