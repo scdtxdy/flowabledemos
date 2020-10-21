@@ -21,6 +21,7 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import {getDicts,formatDictText} from '@/utils/util'
 
 /**
  * If you don't want to use mock-server
@@ -43,7 +44,8 @@ Vue.use(FormMaking)
 
 
 Vue.config.productionTip = false
-
+Vue.prototype.getDicts = getDicts
+Vue.prototype.formatDictText = formatDictText
 
 new Vue({
   el: '#app',

@@ -49,8 +49,8 @@ public class ResponseFactory {
         response.setKey(model.getKey());
         response.setLastUpdateTime(model.getLastUpdateTime());
         try {
-            JsonNode modelNode = objectMapper.readTree(model.getMetaInfo());
-            response.setDescription(modelNode.get("description").asText());
+          JsonNode modelNode = objectMapper.readTree(model.getMetaInfo());
+          response.setDescription(modelNode.get("description").asText());
         } catch (IOException e) {
             e.printStackTrace();
         }

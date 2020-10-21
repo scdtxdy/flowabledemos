@@ -1,22 +1,24 @@
 package com.scd.flowablesystem.rest;
 
-import com.scd.flowablesystem.common.ModelRequest;
-import com.scd.flowablesystem.common.ModelResponse;
-import com.scd.flowablesystem.common.ResponseFactory;
-import com.scd.flowablesystem.common.ReturnCode;
+import com.scd.flowablesystem.common.*;
 import com.scd.flowablesystem.service.IFlowableModelService;
+import com.scd.flowablesystem.util.SpringContextUtils;
 import com.scd.flowablesystem.vo.ModelVo;
 import com.scd.flowablesystem.vo.ReturnVo;
+import com.scd.flowablesystem.wapper.IListWrapper;
+import com.scd.flowablesystem.wapper.ModelListWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.ui.modeler.domain.AbstractModel;
-import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,28 +37,45 @@ import java.util.List;
 public class ApiFlowableModelResource {
 
   @Autowired
-  private IFlowableModelService flowableModelService;
-  @Autowired
-  private ModelService modelService;
-  @Autowired
   private RepositoryService repositoryService;
 
   @Autowired
   private ResponseFactory responseFactory;
 
+  @Autowired
+  private ManagementService managementService;
+
+  @Autowired
+  private IListWrapper listWrapper;
+
+  /**
+   * 模板列表
+   *
+   * @author shang
+   * @date 2020-10-20 16:31
+   * @return getModelsByPage
+   */
   @GetMapping("getMldelsByPage")
   @ResponseBody
   public ReturnVo<org.flowable.engine.repository.Model> getModelsByPage(){
-    ReturnVo<org.flowable.engine.repository.Model> returnVo = new ReturnVo<>();
+    ReturnVo<org.flowable.engine.repository.Model> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "OK");
     ModelQuery modelQuery = repositoryService.createModelQuery();
-    List<org.flowable.engine.repository.Model> list = modelQuery.list();
-    returnVo.setDatas(list);
+    List<Model> list = modelQuery.list();
+    returnVo.setDatas(listWrapper.execute(list));
     return returnVo;
   }
 
+  /**
+   * 创建流程模板
+   *
+   * @param modelRequest
+   * @author shang
+   * @date 2020-10-20 16:12
+   * @return createModel
+   */
   @PostMapping(value = "/saveModel")
   @Transactional(rollbackFor = Exception.class)
-  public ReturnVo<String> createModel(@RequestBody ModelRequest modelRequest){
+  public ReturnVo<String> saveModel(@RequestBody ModelRequest modelRequest){
     ReturnVo<String> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "OK");
     long countNum = repositoryService.createModelQuery().modelKey(modelRequest.getKey()).count();
     if (countNum > 0) {
@@ -73,27 +92,18 @@ public class ApiFlowableModelResource {
     return returnVo;
   }
 
-  @PostMapping(value = "/addModel")
-  @ResponseBody
-  public ReturnVo<String> addModel(@RequestBody ModelVo params) throws UnsupportedEncodingException, XMLStreamException {
-    ReturnVo<String> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "OK");
-    return flowableModelService.addModel(params);
-  }
-
-  @GetMapping(value = "/getModels")
-  @ResponseBody
-  public ReturnVo<org.flowable.engine.repository.Model> getModels(){
-    ReturnVo<org.flowable.engine.repository.Model>returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
-    ModelQuery modelQuery = repositoryService.createModelQuery();
-    List<org.flowable.engine.repository.Model> list = modelQuery.list();
-    returnVo.setDatas(list);
-    return returnVo;
-  }
-
+  /**
+   * 根据id获取流程模板
+   *
+   * @param modelId
+   * @author shang
+   * @date 2020-10-20 16:13
+   * @return getModelById
+   */
   @GetMapping(value = "/getModelsById")
   @ResponseBody
-  public ReturnVo<ModelVo> getModelById(@RequestParam String modelId) throws UnsupportedEncodingException {
-    ReturnVo<ModelVo> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
+  public ReturnVo<ModelResponse> getModelById(@RequestParam String modelId) throws UnsupportedEncodingException {
+    ReturnVo<ModelResponse> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
     org.flowable.engine.repository.Model model = repositoryService.getModel(modelId);
     if (model == null) {
       throw new FlowableObjectNotFoundException("No model found with id " + modelId);
@@ -104,39 +114,27 @@ public class ApiFlowableModelResource {
       String editor = new String(editorBytes, "UTF-8");
       modelResponse.setEditor(editor);
     }
+    returnVo.setData(modelResponse);
     return returnVo;
   }
 
-  @PostMapping("/deploy")
+  /**
+   * 修改流程模板
+   *
+   * @param modelRequest
+   * @author shang
+   * @date 2020-10-20 16:13
+   * @return update
+   */
+  @PutMapping(value = "/updateModel")
+  @Transactional(rollbackFor = Exception.class)
   @ResponseBody
-  public ReturnVo<String> deploy(String modelId){
-    ReturnVo<String> returnVo = new ReturnVo<>(ReturnCode.FAIL, "部署流程失败！");
-    if (StringUtils.isBlank(modelId)) {
-      returnVo.setMsg("模板ID不能为空！");
-      return returnVo;
-    }
-    Model model = modelService.getModel(modelId);
-    if (model == null) {
-      returnVo.setMsg("模板ID不存在！");
-      return returnVo;
-    }
-    BpmnModel bpmnModel = modelService.getBpmnModel(model);
-    //到时候需要添加分类
-    String categoryCode = "1000";
-    //添加隔离信息
-    String tenantId = "flow";
-    Deployment deploy = repositoryService
-        .createDeployment()
-        .name(model.getName())
-        .category(categoryCode)
-        .key(model.getKey())
-        .addBpmnModel(model.getKey() + ".bpmn", bpmnModel)
-        .tenantId(tenantId)
-        .deploy();
-    returnVo.setData(deploy.getId());
-    returnVo.setMsg("部署流程成功！");
-    returnVo.setCode(ReturnCode.SUCCESS);
+  public ReturnVo<String> update(@RequestBody ModelRequest modelRequest) {
+    ReturnVo<String> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
+    managementService.executeCommand(new SaveModelEditorCmd(modelRequest.getId(), modelRequest.getKey(),
+        modelRequest.getName(), modelRequest.getCategory(), modelRequest.getDescription()));
     return returnVo;
   }
+
 
 }

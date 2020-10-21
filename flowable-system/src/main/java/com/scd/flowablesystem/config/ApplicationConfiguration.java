@@ -23,6 +23,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 @Configuration
 @EnableConfigurationProperties({FlowableIdmAppProperties.class, FlowableModelerAppProperties.class})
 @ComponentScan(basePackages = {
+        "com.scd.flowablesystem.wapper",
         "org.flowable.ui.idm.conf",
         "org.flowable.ui.idm.security",
         "org.flowable.ui.idm.service",
