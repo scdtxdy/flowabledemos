@@ -136,5 +136,21 @@ public class ApiFlowableModelResource {
     return returnVo;
   }
 
+  /**
+   * 保存流程设计
+   *
+   * @param modelRequest
+   * @author shang
+   * @date 2020-10-21 17:15
+   * @return saveModelEditor
+   */
+  @PutMapping(value = "/saveModelEditor")
+  @Transactional(rollbackFor = Exception.class)
+  public ReturnVo<String> saveModelEditor(@RequestBody ModelRequest modelRequest) {
+    ReturnVo<String> returnVo = new ReturnVo<>(ReturnCode.SUCCESS, "ok");
+    managementService.executeCommand(new SaveModelEditorCmd(modelRequest.getId(), modelRequest.getEditor()));
+    return returnVo;
+  }
+
 
 }
