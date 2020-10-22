@@ -58,6 +58,9 @@
               <el-dropdown-item icon="el-icon-view" @click.native="btnUpdateModel(row)">
                 流程设计
               </el-dropdown-item>
+              <el-dropdown-item icon="el-icon-edit" divided
+                                @click.native="btnDeploy(row.id)">部署
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -196,6 +199,12 @@
       /* 流程设计*/
       btnUpdateModel(row) {
         this.$router.push({path: '/processManager/modelDesigner', query: {modelId: row.id}})
+      },
+      btnDeploy(id){
+        postAction('/vue-admin-template/rest/model/deploy', {id}).then(({msg}) => {
+          Message.success(msg)
+          this.fetchData()
+        })
       },
       /* 确定添加模板*/
       createData() {

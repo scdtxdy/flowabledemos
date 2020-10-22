@@ -1,4 +1,4 @@
-package com.scd.flowablesystem.common;
+package com.scd.flowablesystem.common.cmd;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
