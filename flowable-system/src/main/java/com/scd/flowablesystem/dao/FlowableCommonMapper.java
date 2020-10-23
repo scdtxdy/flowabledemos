@@ -1,5 +1,6 @@
 package com.scd.flowablesystem.dao;
 
+import com.scd.flowablesystem.common.base.CoreMapper;
 import com.scd.flowablesystem.vo.ProcessDefinitionVo;
 import com.scd.flowablesystem.vo.query.ProcessInstanceQueryVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -7,6 +8,7 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.GroupQueryImpl;
 import org.flowable.idm.engine.impl.UserQueryImpl;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -17,8 +19,9 @@ import java.util.List;
  * @version 1.0
  * @date 2020-10-22 17:45
  */
+@Repository
 @Mapper
-public interface FlowableCommonMapper {
+public interface FlowableCommonMapper extends CoreMapper {
   /**
    * 查询用户信息
    *

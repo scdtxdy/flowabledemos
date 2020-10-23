@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/vue-admin-template/rest/model")
-public class ApiFlowableModelResource {
+public class ModelController {
 
   @Autowired
   private RepositoryService repositoryService;

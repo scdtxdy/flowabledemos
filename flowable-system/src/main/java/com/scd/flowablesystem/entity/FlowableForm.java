@@ -1,17 +1,29 @@
 package com.scd.flowablesystem.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.scd.flowablesystem.common.base.BaseEntity;
 import com.sun.istack.internal.NotNull;
+import jdk.nashorn.internal.objects.annotations.Constructor;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Data
-public class FlowableForm {
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName("T_FLOWABLE_FORM")
+public class FlowableForm extends BaseEntity {
 
-    @NotNull
-    private String formKey;
+  private static final long serialVersionUID = 1L;
 
-    @NotNull
-    private String formName;
+  @TableId
+  @NotNull
+  private String formKey;
 
-    private String formJson;
+  @NotNull
+  private String formName;
+
+  private String formJson;
 }

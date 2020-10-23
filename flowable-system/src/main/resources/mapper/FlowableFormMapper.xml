@@ -15,7 +15,7 @@
         a.UPDATE_DATE as updateDate,
         a.UPDATE_TIME as updateTime
 
-        from act_fo_form_definition  a
+        from t_flowable_form  a
         where 1=1
         <if test="entity.formKey != null and entity.formKey !=''">
             <![CDATA[	AND a.FORM_KEY = #{entity.formKey}	]]>
