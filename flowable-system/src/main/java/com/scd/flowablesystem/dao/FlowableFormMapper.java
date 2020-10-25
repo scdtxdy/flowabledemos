@@ -1,5 +1,6 @@
 package com.scd.flowablesystem.dao;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.scd.flowablesystem.common.base.CoreMapper;
 import com.scd.flowablesystem.entity.FlowableForm;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,10 +16,11 @@ public interface FlowableFormMapper extends CoreMapper<FlowableForm> {
     /**
      * 查询流程表单列表
      *
-     * @param entity
+     * @param page
      * @author shang
      * @date 2020-10-21 23:27
      * @return list
      */
-    public List<FlowableForm>  list(@Param("entity") FlowableForm entity);
+    List<FlowableForm> list(IPage<FlowableForm> page, @Param("entity")FlowableForm flowableForm);
+
 }

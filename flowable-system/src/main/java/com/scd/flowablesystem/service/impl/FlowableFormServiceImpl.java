@@ -1,7 +1,7 @@
 package com.scd.flowablesystem.service.impl;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scd.flowablesystem.common.base.BaseServiceImpl;
 import com.scd.flowablesystem.dao.FlowableFormMapper;
 import com.scd.flowablesystem.entity.FlowableForm;
@@ -23,10 +23,7 @@ public class FlowableFormServiceImpl extends BaseServiceImpl<FlowableFormMapper,
   private FlowableFormMapper flowableFormMapper;
 
   @Override
-  public PageInfo<FlowableForm> list(FlowableForm flowableForm) {
-    PageHelper.startPage(1, 10);
-    List<FlowableForm> list = flowableFormMapper.list(flowableForm);
-    PageInfo<FlowableForm> pageInfo = new PageInfo<>(list);
-    return pageInfo;
+  public IPage<FlowableForm> list(IPage<FlowableForm> page, FlowableForm flowableForm) {
+    return page.setRecords( baseMapper.list(page, flowableForm));
   }
 }

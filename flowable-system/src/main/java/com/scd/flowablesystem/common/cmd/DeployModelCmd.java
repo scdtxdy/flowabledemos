@@ -81,24 +81,24 @@ public class DeployModelCmd implements Command<Deployment>, Serializable {
                         formKey = userTask.getFormKey();
                     }
                 }
-//                if (formKey != null && formKey.length() > 0) {
-//                    if (formKeyMap.containsKey(formKey)) {
-//                        continue;
-//                    } else {
-//                        String formKeyDefinition = formKey.replace(".form", "");
-//                        FlowableFormService flowableFormService =
-//                                SpringContextUtils.getBean(FlowableFormService.class);
-//                        FlowableForm form = flowableFormService.getById(formKeyDefinition);
-//                        if (form != null && form.getFormJson() != null && form.getFormJson().length() > 0) {
-//                            byte[] formJson = form.getFormJson().getBytes("UTF-8");
-//                            ByteArrayInputStream bi = new ByteArrayInputStream(formJson);
-//                            deploymentBuilder.addInputStream(formKey, bi);
-//                            formKeyMap.put(formKey, formKey);
-//                        } else {
-//                            throw new FlowableObjectNotFoundException("Cannot find formJson with formKey " + formKeyDefinition);
-//                        }
-//                    }
-//                }
+                if (formKey != null && formKey.length() > 0) {
+                    if (formKeyMap.containsKey(formKey)) {
+                        continue;
+                    } else {
+                        String formKeyDefinition = formKey.replace(".form", "");
+                        FlowableFormService flowableFormService =
+                                SpringContextUtils.getBean(FlowableFormService.class);
+                        FlowableForm form = flowableFormService.getById(formKeyDefinition);
+                        if (form != null && form.getFormJson() != null && form.getFormJson().length() > 0) {
+                            byte[] formJson = form.getFormJson().getBytes("UTF-8");
+                            ByteArrayInputStream bi = new ByteArrayInputStream(formJson);
+                            deploymentBuilder.addInputStream(formKey, bi);
+                            formKeyMap.put(formKey, formKey);
+                        } else {
+                            throw new FlowableObjectNotFoundException("Cannot find formJson with formKey " + formKeyDefinition);
+                        }
+                    }
+                }
             }
 
             if (model.getTenantId() != null) {

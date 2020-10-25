@@ -64,6 +64,12 @@ export const constantRoutes = [
     meta: { title: '流程管理', icon: 'el-icon-s-help' },
     children: [
       {
+        path: 'forms',
+        name: 'Forms',
+        component: () => import('@/views/processManager/flowableForms'),
+        meta: { title: '表单列表', icon: 'table', "isCache": true, "affix": false}
+      },
+      {
         path: 'models',
         name: 'Models',
         component: () => import('@/views/processManager/models'),
