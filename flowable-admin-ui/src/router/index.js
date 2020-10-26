@@ -70,6 +70,13 @@ export const constantRoutes = [
         meta: { title: '表单列表', icon: 'table', "isCache": true, "affix": false}
       },
       {
+        path: '/flowableFormEdit',
+        name: 'flowableFormEdit',
+        hidden: true,
+        component: () => import('@/views/processManager/flowableForms/edit'),
+        meta: { title: '修改表单', icon: 'table', "isCache": true, "affix": false}
+      },
+      {
         path: 'models',
         name: 'Models',
         component: () => import('@/views/processManager/models'),
